@@ -1,6 +1,6 @@
 package src
 
-func Exec() {
+func Solve() {
 	b := DefaultBoard
 	b.Display()
 

@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	src.Exec()
+	src.Solve()
 }
