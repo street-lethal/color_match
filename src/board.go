@@ -57,6 +57,14 @@ func (b *Board) ReOrder(ids []int) {
 		tiles[ids[6]], tiles[ids[7]], tiles[ids[8]]
 }
 
+func (b *Board) Copy() *Board {
+	return &Board{
+		b.UpperLeft.Copy(), b.Up.Copy(), b.UpperRight.Copy(),
+		b.Left.Copy(), b.Center.Copy(), b.Right.Copy(),
+		b.LowerLeft.Copy(), b.Down.Copy(), b.LowerRight.Copy(),
+	}
+}
+
 func (b *Board) adjustAround() bool {
 	return b.Right.AdjustToLeft(b.Center) &&
 		b.Up.AdjustToDown(b.Center) &&

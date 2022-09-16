@@ -1,12 +1,5 @@
 package src
 
-func Solve() {
-	board := find()
-	if board != nil {
-		board.Display()
-	}
-}
-
 func getNext(nums []int) []int {
 	for i := 1; i < len(nums); i++ {
 		if nums[i-1] < nums[i] {
@@ -42,14 +35,19 @@ func getNext(nums []int) []int {
 	return nil
 }
 
-func find() *Board {
+func Find(count int) *[]Board {
 	ids := []int{8, 7, 6, 5, 4, 3, 2, 1, 0}
+
+	correctBoards := make([]Board, 0)
 
 	for ids != nil {
 		board := &DefaultBoard
 		board.ReOrder(ids)
 		if board.Adjust() {
-			return board
+			correctBoards = append(correctBoards, *board.Copy())
+			if len(correctBoards) >= count {
+				return &correctBoards
+			}
 		}
 		ids = getNext(ids)
 	}

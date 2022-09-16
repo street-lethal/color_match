@@ -6,5 +6,11 @@ import (
 
 func main() {
 	src.DefaultBoard.Display()
-	src.Solve()
+
+	boards := src.Find(2)
+	if boards != nil {
+		for _, board := range *boards {
+			board.Display()
+		}
+	}
 }
