@@ -5,5 +5,6 @@ import (
 )
 
 func main() {
+	src.DefaultBoard.Display()
 	src.Solve()
 }

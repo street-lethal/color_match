@@ -47,6 +47,16 @@ func (b *Board) Display() {
 	}
 }
 
+func (b *Board) ReOrder(ids []int) {
+	tiles := *b.Tiles()
+	b.UpperLeft, b.Up, b.UpperRight,
+		b.Left, b.Center, b.Right,
+		b.LowerLeft, b.Down, b.LowerRight =
+		tiles[ids[0]], tiles[ids[1]], tiles[ids[2]],
+		tiles[ids[3]], tiles[ids[4]], tiles[ids[5]],
+		tiles[ids[6]], tiles[ids[7]], tiles[ids[8]]
+}
+
 func (b *Board) adjustAround() bool {
 	return b.Right.AdjustToLeft(b.Center) &&
 		b.Up.AdjustToDown(b.Center) &&

@@ -1,9 +1,6 @@
 package src
 
 func Solve() {
-	b := DefaultBoard
-	b.Display()
-
 	board := find()
 	if board != nil {
 		board.Display()
@@ -46,27 +43,11 @@ func getNext(nums []int) []int {
 }
 
 func find() *Board {
-	var board *Board
-
 	ids := []int{8, 7, 6, 5, 4, 3, 2, 1, 0}
 
 	for ids != nil {
-		tiles := make([]*Tile, 9)
-		for i, id := range ids {
-			tile := (*DefaultBoard.Tiles())[id]
-			tiles[i] = tile.Copy()
-		}
-		board = &Board{
-			tiles[0],
-			tiles[1],
-			tiles[2],
-			tiles[3],
-			tiles[4],
-			tiles[5],
-			tiles[6],
-			tiles[7],
-			tiles[8],
-		}
+		board := &DefaultBoard
+		board.ReOrder(ids)
 		if board.Adjust() {
 			return board
 		}
