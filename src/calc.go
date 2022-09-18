@@ -44,13 +44,25 @@ func Find(count int) *[]Board {
 		board := &DefaultBoard
 		board.ReOrder(ids)
 		if board.Adjust() {
+			alreadyFound := false
+			for _, foundBoard := range correctBoards {
+				if board.IsEquivalentTo(&foundBoard) {
+					alreadyFound = true
+					break
+				}
+			}
+
+			if alreadyFound {
+				continue
+			}
+
 			correctBoards = append(correctBoards, *board.Copy())
 			if len(correctBoards) >= count {
-				return &correctBoards
+				break
 			}
 		}
 		ids = getNext(ids)
 	}
 
-	return nil
+	return &correctBoards
 }

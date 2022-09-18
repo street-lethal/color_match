@@ -65,6 +65,55 @@ func (b *Board) Copy() *Board {
 	}
 }
 
+func (b *Board) IsEquivalentTo(other *Board) bool {
+	if !b.Center.IsEquivalentTo(other.Center) {
+		return false
+	}
+
+	copied := other.Copy()
+
+	if b.Center.Right == copied.Center.Right {
+		// Skip
+	} else if b.Center.Right == copied.Center.Down {
+		copied.rotate()
+	} else if b.Center.Right == copied.Center.Left {
+		copied.rotate()
+		copied.rotate()
+	} else {
+		copied.rotate()
+		copied.rotate()
+		copied.rotate()
+	}
+
+	return b.UpperLeft.OverlapsWith(copied.UpperLeft) &&
+		b.Up.OverlapsWith(copied.Up) &&
+		b.UpperRight.OverlapsWith(copied.UpperRight) &&
+		b.Left.OverlapsWith(copied.Left) &&
+		b.Center.OverlapsWith(copied.Center) &&
+		b.Right.OverlapsWith(copied.Right) &&
+		b.LowerLeft.OverlapsWith(copied.LowerLeft) &&
+		b.Down.OverlapsWith(copied.Down) &&
+		b.LowerRight.OverlapsWith(copied.LowerRight)
+}
+
+func (b *Board) rotate() {
+	b.UpperLeft, b.Up, b.UpperRight,
+		b.Right, b.LowerRight,
+		b.Down, b.LowerLeft, b.Left =
+		b.UpperRight, b.Right, b.LowerRight,
+		b.Down, b.LowerLeft,
+		b.Left, b.UpperLeft, b.Up
+	b.UpperLeft.Rotate90()
+	b.Up.Rotate90()
+	b.UpperRight.Rotate90()
+	b.Left.Rotate90()
+	b.Center.Rotate90()
+	b.Right.Rotate90()
+	b.LowerLeft.Rotate90()
+	b.Down.Rotate90()
+	b.LowerRight.Rotate90()
+}
+
 func (b *Board) adjustAround() bool {
 	return b.Right.AdjustToLeft(b.Center) &&
 		b.Up.AdjustToDown(b.Center) &&

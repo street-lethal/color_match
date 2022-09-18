@@ -22,6 +22,30 @@ func (t *Tile) Copy() *Tile {
 	return NewTile(t.Right, t.Up, t.Left, t.Down)
 }
 
+func (t *Tile) IsEquivalentTo(other *Tile) bool {
+	copied := other.Copy()
+
+	for i := 0; i < 4; i++ {
+		if t.Right == copied.Right &&
+			t.Up == copied.Up &&
+			t.Left == copied.Left &&
+			t.Down == copied.Down {
+			return true
+		}
+
+		copied.Rotate90()
+	}
+
+	return false
+}
+
+func (t *Tile) OverlapsWith(other *Tile) bool {
+	return t.Right == other.Right &&
+		t.Down == other.Down &&
+		t.Left == other.Left &&
+		t.Up == other.Up
+}
+
 func (t *Tile) Rotate90() {
 	t.Right, t.Up, t.Left, t.Down = t.Down, t.Right, t.Up, t.Left
 }
