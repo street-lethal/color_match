@@ -6,9 +6,9 @@ import (
 )
 
 func main() {
-	src.DefaultBoard.Display()
+	src.DefaultVectoredBoard.Display()
 
-	boards := src.Find(10)
+	boards := src.Find(2)
 	if boards != nil {
 		for _, board := range *boards {
 			board.Display()

@@ -41,7 +41,7 @@ func Find(count int) *[]Board {
 	correctBoards := make([]Board, 0)
 
 	for ids != nil {
-		board := &DefaultBoard
+		board := &DefaultVectoredBoard
 		board.ReOrder(ids)
 		if board.Adjust() {
 			alreadyFound := false
