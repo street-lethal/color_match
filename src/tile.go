@@ -1,5 +1,7 @@
 package src
 
+import "fmt"
+
 type Color string
 
 const (
@@ -10,78 +12,95 @@ const (
 	Pink   Color = "P"
 )
 
-type Tile struct {
+type Tile interface {
+	Copy() Tile
+	Display() []string
+	OverlapsWith(other Tile) bool
+	Rotate90()
+	MatchesRight(other Tile) bool
+	MatchesUp(other Tile) bool
+	MatchesLeft(other Tile) bool
+	MatchesDown(other Tile) bool
+	AdjustToRight(other Tile) bool
+	AdjustToUp(other Tile) bool
+	AdjustToLeft(other Tile) bool
+	AdjustToDown(other Tile) bool
+}
+type tile struct {
 	Right, Up, Left, Down Color
 }
 
-func NewTile(right, up, left, down Color) *Tile {
-	return &Tile{right, up, left, down}
+func NewTile(right, up, left, down Color) Tile {
+	return &tile{right, up, left, down}
 }
 
-func (t *Tile) Copy() *Tile {
+func (t *tile) Copy() Tile {
 	return NewTile(t.Right, t.Up, t.Left, t.Down)
 }
 
-func (t *Tile) IsEquivalentTo(other *Tile) bool {
-	copied := other.Copy()
-
-	for i := 0; i < 4; i++ {
-		if t.Right == copied.Right &&
-			t.Up == copied.Up &&
-			t.Left == copied.Left &&
-			t.Down == copied.Down {
-			return true
-		}
-
-		copied.Rotate90()
+func (t *tile) Display() []string {
+	return []string{
+		fmt.Sprintf("   %v   ", t.Up),
+		fmt.Sprintf(" %v   %v ", t.Left, t.Right),
+		fmt.Sprintf("   %v   ", t.Down),
 	}
-
-	return false
 }
 
-func (t *Tile) OverlapsWith(other *Tile) bool {
-	return t.Right == other.Right &&
-		t.Down == other.Down &&
-		t.Left == other.Left &&
-		t.Up == other.Up
+func (t *tile) OverlapsWith(other Tile) bool {
+	otherTile, _ := other.Copy().(*tile)
+
+	return t.Right == otherTile.Right &&
+		t.Down == otherTile.Down &&
+		t.Left == otherTile.Left &&
+		t.Up == otherTile.Up
 }
 
-func (t *Tile) Rotate90() {
+func (t *tile) Rotate90() {
 	t.Right, t.Up, t.Left, t.Down = t.Down, t.Right, t.Up, t.Left
 }
 
-func (t *Tile) Rotate180() {
+func (t *tile) Rotate180() {
 	t.Right, t.Up, t.Left, t.Down = t.Left, t.Down, t.Right, t.Up
 }
 
-func (t *Tile) Rotate270() {
+func (t *tile) Rotate270() {
 	t.Right, t.Up, t.Left, t.Down = t.Up, t.Left, t.Down, t.Right
 }
 
-func (t *Tile) MatchesRight(other *Tile) bool {
-	return t.Right == other.Left
+func (t *tile) MatchesRight(other Tile) bool {
+	otherTile, _ := other.(*tile)
+
+	return t.Right == otherTile.Left
 }
 
-func (t *Tile) MatchesLeft(other *Tile) bool {
-	return t.Left == other.Right
+func (t *tile) MatchesLeft(other Tile) bool {
+	otherTile, _ := other.(*tile)
+
+	return t.Left == otherTile.Right
 }
 
-func (t *Tile) MatchesUp(other *Tile) bool {
-	return t.Up == other.Down
+func (t *tile) MatchesUp(other Tile) bool {
+	otherTile, _ := other.(*tile)
+
+	return t.Up == otherTile.Down
 }
 
-func (t *Tile) MatchesDown(other *Tile) bool {
-	return t.Down == other.Up
+func (t *tile) MatchesDown(other Tile) bool {
+	otherTile, _ := other.(*tile)
+
+	return t.Down == otherTile.Up
 }
 
-func (t *Tile) AdjustToRight(other *Tile) bool {
-	if t.MatchesRight(other) {
+func (t *tile) AdjustToRight(other Tile) bool {
+	otherTile, _ := other.(*tile)
+
+	if t.MatchesRight(otherTile) {
 		// Skip
-	} else if t.Down == other.Left {
+	} else if t.Down == otherTile.Left {
 		t.Rotate90()
-	} else if t.Left == other.Left {
+	} else if t.Left == otherTile.Left {
 		t.Rotate180()
-	} else if t.Up == other.Left {
+	} else if t.Up == otherTile.Left {
 		t.Rotate270()
 	} else {
 		return false
@@ -90,14 +109,16 @@ func (t *Tile) AdjustToRight(other *Tile) bool {
 	return true
 }
 
-func (t *Tile) AdjustToUp(other *Tile) bool {
-	if t.MatchesUp(other) {
+func (t *tile) AdjustToUp(other Tile) bool {
+	otherTile, _ := other.(*tile)
+
+	if t.MatchesUp(otherTile) {
 		// Skip
-	} else if t.Right == other.Down {
+	} else if t.Right == otherTile.Down {
 		t.Rotate90()
-	} else if t.Down == other.Down {
+	} else if t.Down == otherTile.Down {
 		t.Rotate180()
-	} else if t.Left == other.Down {
+	} else if t.Left == otherTile.Down {
 		t.Rotate270()
 	} else {
 		return false
@@ -106,14 +127,16 @@ func (t *Tile) AdjustToUp(other *Tile) bool {
 	return true
 }
 
-func (t *Tile) AdjustToLeft(other *Tile) bool {
-	if t.MatchesLeft(other) {
+func (t *tile) AdjustToLeft(other Tile) bool {
+	otherTile, _ := other.(*tile)
+
+	if t.MatchesLeft(otherTile) {
 		// Skip
-	} else if t.Up == other.Right {
+	} else if t.Up == otherTile.Right {
 		t.Rotate90()
-	} else if t.Right == other.Right {
+	} else if t.Right == otherTile.Right {
 		t.Rotate180()
-	} else if t.Down == other.Right {
+	} else if t.Down == otherTile.Right {
 		t.Rotate270()
 	} else {
 		return false
@@ -122,14 +145,16 @@ func (t *Tile) AdjustToLeft(other *Tile) bool {
 	return true
 }
 
-func (t *Tile) AdjustToDown(other *Tile) bool {
-	if t.MatchesDown(other) {
+func (t *tile) AdjustToDown(other Tile) bool {
+	otherTile, _ := other.(*tile)
+
+	if t.MatchesDown(otherTile) {
 		// Skip
-	} else if t.Left == other.Up {
+	} else if t.Left == otherTile.Up {
 		t.Rotate90()
-	} else if t.Up == other.Up {
+	} else if t.Up == otherTile.Up {
 		t.Rotate180()
-	} else if t.Right == other.Up {
+	} else if t.Right == otherTile.Up {
 		t.Rotate270()
 	} else {
 		return false
