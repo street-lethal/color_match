@@ -5,11 +5,11 @@ import "fmt"
 type Board struct {
 	UpperLeft, Up, UpperRight,
 	Left, Center, Right,
-	LowerLeft, Down, LowerRight *Tile
+	LowerLeft, Down, LowerRight Tile
 }
 
-func (b *Board) Tiles() *[]*Tile {
-	tiles := []*Tile{
+func (b *Board) Tiles() *[]Tile {
+	tiles := []Tile{
 		b.UpperLeft, b.Up, b.UpperRight,
 		b.Left, b.Center, b.Right,
 		b.LowerLeft, b.Down, b.LowerRight,
@@ -19,30 +19,17 @@ func (b *Board) Tiles() *[]*Tile {
 }
 
 func (b *Board) Display() {
-	tiles := []*Tile{
-		b.UpperLeft, b.Up, b.UpperRight,
-		b.Left, b.Center, b.Right,
-		b.LowerLeft, b.Down, b.LowerRight,
+	rows := [][]Tile{
+		{b.UpperLeft, b.Up, b.UpperRight},
+		{b.Left, b.Center, b.Right},
+		{b.LowerLeft, b.Down, b.LowerRight},
 	}
-	var tile1, tile2, tile3 *Tile
 	fmt.Println("+-------+-------+-------+")
-	for i := 0; i < 3; i++ {
-		n := i * 3
-		tile1, tile2, tile3 = tiles[n+0], tiles[n+1], tiles[n+2]
-		fmt.Printf(
-			"|   %v   |   %v   |   %v   |\n",
-			tile1.Up, tile2.Up, tile3.Up,
-		)
-		fmt.Printf(
-			"| %v   %v | %v   %v | %v   %v |\n",
-			tile1.Left, tile1.Right,
-			tile2.Left, tile2.Right,
-			tile3.Left, tile3.Right,
-		)
-		fmt.Printf(
-			"|   %v   |   %v   |   %v   |\n",
-			tile1.Down, tile2.Down, tile3.Down,
-		)
+	for _, tiles := range rows {
+		left, center, right := tiles[0], tiles[1], tiles[2]
+		fmt.Printf("|%v|%v|%v|\n", left.Display()[0], center.Display()[0], right.Display()[0])
+		fmt.Printf("|%v|%v|%v|\n", left.Display()[1], center.Display()[1], right.Display()[1])
+		fmt.Printf("|%v|%v|%v|\n", left.Display()[2], center.Display()[2], right.Display()[2])
 		fmt.Println("+-------+-------+-------+")
 	}
 }
@@ -66,34 +53,24 @@ func (b *Board) Copy() *Board {
 }
 
 func (b *Board) IsEquivalentTo(other *Board) bool {
-	if !b.Center.IsEquivalentTo(other.Center) {
-		return false
-	}
-
 	copied := other.Copy()
 
-	if b.Center.Right == copied.Center.Right {
-		// Skip
-	} else if b.Center.Right == copied.Center.Down {
-		copied.rotate()
-	} else if b.Center.Right == copied.Center.Left {
-		copied.rotate()
-		copied.rotate()
-	} else {
-		copied.rotate()
-		copied.rotate()
+	for i := 0; i < 4; i++ {
+		if b.Center.OverlapsWith(copied.Center) {
+			return b.UpperLeft.OverlapsWith(copied.UpperLeft) &&
+				b.Up.OverlapsWith(copied.Up) &&
+				b.UpperRight.OverlapsWith(copied.UpperRight) &&
+				b.Left.OverlapsWith(copied.Left) &&
+				b.Center.OverlapsWith(copied.Center) &&
+				b.Right.OverlapsWith(copied.Right) &&
+				b.LowerLeft.OverlapsWith(copied.LowerLeft) &&
+				b.Down.OverlapsWith(copied.Down) &&
+				b.LowerRight.OverlapsWith(copied.LowerRight)
+		}
 		copied.rotate()
 	}
 
-	return b.UpperLeft.OverlapsWith(copied.UpperLeft) &&
-		b.Up.OverlapsWith(copied.Up) &&
-		b.UpperRight.OverlapsWith(copied.UpperRight) &&
-		b.Left.OverlapsWith(copied.Left) &&
-		b.Center.OverlapsWith(copied.Center) &&
-		b.Right.OverlapsWith(copied.Right) &&
-		b.LowerLeft.OverlapsWith(copied.LowerLeft) &&
-		b.Down.OverlapsWith(copied.Down) &&
-		b.LowerRight.OverlapsWith(copied.LowerRight)
+	return false
 }
 
 func (b *Board) rotate() {
